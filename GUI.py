@@ -4,6 +4,13 @@ import customtkinter
 import os
 from PIL import Image
 
+import sqlite3
+
+connection = sqlite3.connect("LH_Database.db")
+cursor = connection.cursor()
+
+from CreateCustomer import add_customer_function
+from CreateCustomer import get_all_customers
 
 class App(customtkinter.CTk):
 
@@ -69,10 +76,10 @@ class App(customtkinter.CTk):
                                                    image=self.dashboard_image, anchor="w", command=self.dashboard_button_event)
         self.dashboard_button.grid(row=1, column=0, sticky="ew")
 
-        self.frame_2_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Frame 2",
+        self.customers_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Customers",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                      image=self.chat_image, anchor="w", command=self.frame_2_button_event)
-        self.frame_2_button.grid(row=2, column=0, sticky="ew")
+                                                      image=self.chat_image, anchor="w", command=self.customers_button_event)
+        self.customers_button.grid(row=2, column=0, sticky="ew")
 
         self.frame_3_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Frame 3",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
@@ -119,8 +126,38 @@ class App(customtkinter.CTk):
         self.longest_unpaid_frame = customtkinter.CTkFrame(self.dashboard_frame, fg_color="white")
         self.longest_unpaid_frame.grid(row=1, column=1, sticky="ew", padx=10, pady=10)
 
-        # create second frame
-        self.second_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+
+
+
+
+
+
+
+
+
+
+        # create customers frame
+        self.customers_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        get_customers = get_all_customers()
+
+        for customer in get_customers:
+            i = 0
+            customer_button = "customers_frame_button_" + str(i)
+            self.customer_button = customtkinter.CTkButton(self.customers_frame, text=customer[1])
+            # self.customer_button.grid(row=i, column=0, padx=20, pady=10)
+            self.customer_button.pack(padx=20, pady=10)
+
+            i = i + 1
+ 
+
+
+
+
+
+
+
+
+
 
         # create third frame
         self.third_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -131,7 +168,7 @@ class App(customtkinter.CTk):
     def select_frame_by_name(self, name):
         # set button color for selected button
         self.dashboard_button.configure(fg_color=("gray75", "gray25") if name == "dashboard" else "transparent")
-        self.frame_2_button.configure(fg_color=("gray75", "gray25") if name == "frame_2" else "transparent")
+        self.customers_button.configure(fg_color=("gray75", "gray25") if name == "customers" else "transparent")
         self.frame_3_button.configure(fg_color=("gray75", "gray25") if name == "frame_3" else "transparent")
 
         # show selected frame
@@ -139,10 +176,10 @@ class App(customtkinter.CTk):
             self.dashboard_frame.grid(row=0, column=1, sticky="nsew")
         else:
             self.dashboard_frame.grid_forget()
-        if name == "frame_2":
-            self.second_frame.grid(row=0, column=1, sticky="nsew")
+        if name == "customers":
+            self.customers_frame.grid(row=0, column=1, sticky="nsew")
         else:
-            self.second_frame.grid_forget()
+            self.customers_frame.grid_forget()
         if name == "frame_3":
             self.third_frame.grid(row=0, column=1, sticky="nsew")
         else:
@@ -151,8 +188,8 @@ class App(customtkinter.CTk):
     def dashboard_button_event(self):
         self.select_frame_by_name("dashboard")
 
-    def frame_2_button_event(self):
-        self.select_frame_by_name("frame_2")
+    def customers_button_event(self):
+        self.select_frame_by_name("customers")
 
     def frame_3_button_event(self):
         self.select_frame_by_name("frame_3")
@@ -235,20 +272,21 @@ class App(customtkinter.CTk):
         # label = customtkinter.CTkLabel(window, text="CTkToplevel window")
         # label.pack(side="top", fill="both", expand=True, padx=40, pady=40)
 
-        submitCustomerButton = customtkinter.CTkButton(window, command=lambda: self.create_new_customer(customerNameEntry.get(), plateNoEntry.get(), depositEntry.get(), loanTermEntry.get(), monthlyEntry.get(), vehicleModelEntry.get(), vehicleEngineNoEntry.get(), bookNoEntry.get(), positionInBookEntry.get()))
+        submitCustomerButton = customtkinter.CTkButton(window, text="Submit", command=lambda: self.create_new_customer(customerNameEntry.get(), plateNoEntry.get(), depositEntry.get(), loanTermEntry.get(), monthlyEntry.get(), vehicleModelEntry.get(), vehicleEngineNoEntry.get(), bookNoEntry.get(), positionInBookEntry.get()))
         submitCustomerButton.grid(row=10)
 
 
-    def create_new_customer(self, customerName, plateNo, deposit, loanTerm, monthly, vehicleModel, vehicleEngineNo, bookNo, positionInBook):
-        print("Customer Name: ", customerName)
-        print("Plate No ", plateNo)
-        print("Deposit: RM", deposit)
-        print("Loan Term: ", loanTerm, " Months")
-        print("Monthly: RM", monthly)
-        print("Vehicle Model: ", vehicleModel)
-        print("Vehicle Engine No: ", vehicleEngineNo)
-        print("Book No: ", bookNo)
-        print("Position In Book", positionInBook)
+    def create_new_customer(self, name, plate, deposit, loanterm, monthly, vehicle, engineno, bookno, bookindex):
+        # print("Customer Name: ", customerName)
+        # print("Plate No ", plateNo)
+        # print("Deposit: RM", deposit)
+        # print("Loan Term: ", loanTerm, " Months")
+        # print("Monthly: RM", monthly)
+        # print("Vehicle Model: ", vehicleModel)
+        # print("Vehicle Engine No: ", vehicleEngineNo)
+        # print("Book No: ", bookNo)
+        # print("Position In Book", positionInBook)
+        add_customer_function(name, plate, deposit, loanterm, monthly, vehicle, engineno, bookno, bookindex)
 
 
 
